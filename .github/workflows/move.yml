@@ -1,0 +1,24 @@
+name: Décompresser le zip
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'archive.zip'
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Décompresser
+        run: |
+          unzip -o archive.zip -d .
+          rm archive.zip
+      - name: Enregistrer
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Ajout des fichiers depuis le zip" || echo "Rien à ajouter"
+          git push
