@@ -1,0 +1,16 @@
+project_id = "xacfojsohshvnyvqaoil"
+
+[functions.create-user]
+verify_jwt = false
+
+[functions.extract-candidates]
+verify_jwt = false
+
+[functions.delete-user]
+verify_jwt = false
+
+[functions.reset-password]
+verify_jwt = false
+
+[functions.lookup-result]
+verify_jwt = false
