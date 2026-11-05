@@ -1,18 +1,16 @@
 name: Vider le dépôt (sauf workflows)
 
 on:
+  push:
+    paths:
+      - '.github/workflows/vider-depot.yml'
   workflow_dispatch:
-    inputs:
-      confirmation:
-        description: 'Tapez SUPPRIMER pour confirmer'
-        required: true
 
 permissions:
   contents: write
 
 jobs:
   vider:
-    if: ${{ github.event.inputs.confirmation == 'SUPPRIMER' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +24,6 @@ jobs:
               *) git rm -rq --ignore-unmatch -- "$f"; rm -rf -- "$f" ;;
             esac
           done
-          # dans .github, ne garder que workflows
           for f in .github/*; do
             [ "$f" = ".github/workflows" ] || { git rm -rq --ignore-unmatch -- "$f"; rm -rf -- "$f"; }
           done
