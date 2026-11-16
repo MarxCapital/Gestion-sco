@@ -1,0 +1,37 @@
+name: Vider le dépôt (sauf workflows)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/vider-depot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Supprimer tout sauf .github/workflows
+        run: |
+          shopt -s dotglob nullglob
+          for f in *; do
+            case "$f" in
+              .git|.github) ;;
+              *) git rm -rq --ignore-unmatch -- "$f"; rm -rf -- "$f" ;;
+            esac
+          done
+          for f in .github/*; do
+            [ "$f" = ".github/workflows" ] || { git rm -rq --ignore-unmatch -- "$f"; rm -rf -- "$f"; }
+          done
+
+      - name: Enregistrer la suppression
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo "Rien à supprimer" || git commit -m "Vider le dépôt (workflows conservés)"
+          git push
