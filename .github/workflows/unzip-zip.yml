@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'archive.zip'
+      - '*.zip'
 permissions:
   contents: write
 jobs:
@@ -11,10 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Décompresser
+      - name: Décompresser tous les fichiers .zip à la racine
         run: |
-          unzip -o archive.zip -d .
-          rm archive.zip
+          shopt -s nullglob nocaseglob
+          zips=(*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "Aucun fichier .zip à la racine."
+            exit 0
+          fi
+          for z in "${zips[@]}"; do
+            echo "Décompression de : $z"
+            unzip -o -q "$z" -d .
+            rm -f -- "$z"
+          done
       - name: Enregistrer
         run: |
           git config user.name "github-actions"
